@@ -40,7 +40,13 @@ $routes->group('citas', function ($routes) {
 //                           Notificaciones ROUTES
 // ========================================================================
 $routes->group('notificaciones', function ($routes) {
-    $routes->get('usuario/(:num)', 'Notificaciones::getNotificaciones/$1'); // Obtener notificaciones
-    $routes->post('crear', 'Notificaciones::crearNotificacion'); // Crear notificación
-    $routes->delete('eliminar/(:num)', 'Notificaciones::eliminarNotificacion/$1'); // Eliminar notificación
+    $routes->get('usuario/(:num)', 'Notificaciones::obtenerNotificaciones/$1');
+    $routes->post('crear', 'Notificaciones::crearNotificacion');
+    $routes->put('leer/(:num)', 'Notificaciones::marcarLeida/$1');
+    $routes->put('eliminar/(:num)', 'Notificaciones::eliminarNotificacion/$1');
 });
+
+// ========================================================================
+//                           APIKEY ROUTES
+// ========================================================================
+$routes->get('configuracion/api-key', 'Configuracion::obtenerClaveAPI');

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\EspecialidadesModel;
 use App\Models\CentrosSaludModel;
 use App\Models\DisponibilidadesModel;
+use App\Models\NotificacionesModel;
 use App\Models\CitasModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -21,6 +22,7 @@ class Citas extends ResourceController
         $this->especialidadesModel = new EspecialidadesModel();
         $this->centrosSaludModel = new CentrosSaludModel();
         $this->disponibilidadesModel = new DisponibilidadesModel();
+        $this->notificacionesModel = new NotificacionesModel();
         $this->citasModel = new CitasModel();
     }
 
@@ -138,7 +140,7 @@ class Citas extends ResourceController
                 ->where('hora_cita', $horaStr) // Mantén el formato H:i:s directamente
                 ->countAllResults();
     
-            log_message('error', "Resultado de ocupación para {$horaStr}: {$ocupado}");
+            //log_message('error', "Resultado de ocupación para {$horaStr}: {$ocupado}");
     
             if ($ocupado == 0) {
                 $horariosDisponibles[] = $horaStr;
@@ -246,7 +248,30 @@ class Citas extends ResourceController
     // Cancelar una cita
     public function cancelarCita($idCita)
     {
-        $this->citasModel->update($idCita, ['id_estado' => 3]);
+
+        log_message('error', "Intentando cancelar cita con ID: $idCita");
+
+        // Verificar si la cita existe antes de actualizar
+        $citaExistente = $this->citasModel->find($idCita);
+
+        if (!$citaExistente) {
+            return $this->failNotFound("Cita no encontrada");
+        }
+
+        // Intentar actualizar el estado de la cita a cancelado (3)
+        $actualizado = $this->citasModel->update($idCita, ['id_estado' => 3]);
+
+        if (!$actualizado) {
+            return $this->fail("Error al cancelar la cita. Inténtalo de nuevo.", 500);
+        }
+
+        // 🔹 Crear notificación automática
+        $this->crearNotificacionAutomatica(
+            $citaExistente['id_usuario'],
+            "Cita cancelada",
+            "Tu cita programada para el {$citaExistente['fecha_cita']} a las {$citaExistente['hora_cita']} ha sido cancelada.",
+            "cancel"
+        );
 
         return $this->respond([
             'status' => 200,
@@ -278,4 +303,17 @@ class Citas extends ResourceController
             'message' => 'Cita reagendada con éxito'
         ], ResponseInterface::HTTP_OK);
     }    
+
+
+    private function crearNotificacionAutomatica($idUsuario, $titulo, $descripcion, $icono)
+    {
+        $this->notificacionesModel->insert([
+            'id_usuario'   => $idUsuario,
+            'titulo'       => $titulo,
+            'descripcion'  => $descripcion,
+            'icono'        => $icono,
+            'id_estado'    => 1 // Pendiente por defecto
+        ]);
+    }
+
 }

@@ -10,6 +10,7 @@ class UserModel extends Model
     protected $primaryKey = 'id_usuario';
     protected $allowedFields = [
         'nombre',
+        'cedula',
         'email',
         'password',
         'telefono',

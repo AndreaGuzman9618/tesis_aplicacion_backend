@@ -66,21 +66,20 @@ class Users extends ResourceController
 
     public function login()
     {
-        // Obtener datos de la solicitud
-        $email = $this->request->getVar('email'); // Email enviado desde el frontend
-        $password = $this->request->getVar('password'); // Contraseña enviada desde el frontend
+        $cedula = $this->request->getVar('cedula'); 
+        $password = $this->request->getVar('password');
 
         // Validar datos obligatorios
-        if (!$email || !$password) {
+        if (!$cedula || !$password) {
             return $this->respond([
                 'status' => ResponseInterface::HTTP_BAD_REQUEST,
-                'message' => 'Por favor, ingrese email y contraseña.',
+                'message' => 'Por favor, ingrese una cédula y contraseña.',
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
         // Consultar el usuario en la base de datos
         $userModel = new UserModel();
-        $user = $userModel->where('email', $email)->first();
+        $user = $userModel->where('cedula', $cedula)->first();
 
         // Verificar si el usuario existe
         if (!$user) {
@@ -105,6 +104,7 @@ class Users extends ResourceController
             'data' => [
                 'id_usuario' => (int)$user['id_usuario'],
                 'nombre' => $user['nombre'],
+                'cedula' => $user['cedula'],
                 'email' => $user['email'],
             ],
         ], ResponseInterface::HTTP_OK);
