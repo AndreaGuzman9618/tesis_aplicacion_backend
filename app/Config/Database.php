@@ -27,8 +27,8 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
-        'username'     => 'root',
-        'password'     => '',
+        'username'     => 'root', // Usuario de MySQL en XAMPP
+        'password'     => '', // Dejar vacío si no tiene contraseña
         'database'     => 'tesis_aplicacion',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',

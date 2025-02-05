@@ -50,3 +50,9 @@ $routes->group('notificaciones', function ($routes) {
 //                           APIKEY ROUTES
 // ========================================================================
 $routes->get('configuracion/api-key', 'Configuracion::obtenerClaveAPI');
+
+// ========================================================================
+//                           Evaluaciones ROUTES
+// ========================================================================
+$routes->post('evaluaciones/guardar', 'Evaluaciones::guardar');
+$routes->get('evaluaciones/listar', 'Evaluaciones::listar');
